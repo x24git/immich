@@ -597,4 +597,53 @@ describe(AssetMediaService.name, () => {
       expect(assetMock.getByChecksums).toHaveBeenCalledWith(authStub.admin.user.id, [file1, file2]);
     });
   });
+
+  describe('checksum exists', () => {
+    it('should query for all checksums when no device ID provieded', async () => {
+      const file1 = Buffer.from('d2947b871a706081be194569951b7db246907957', 'hex');
+      const file2 = Buffer.from('53be335e99f18a66ff12e9a901c7a6171dd76573', 'hex');
+
+      assetMock.getExistingByDeviceId.mockResolvedValue([
+        { id: 'asset-1', checksum: file1 } as AssetEntity,
+        { id: 'asset-2', checksum: file2 } as AssetEntity,
+      ]);
+
+      await expect(
+        sut.checkExistingAssetChecksums(authStub.admin, {
+          deviceAssets: [
+            { deviceAssetId: '1', checksum: file1.toString('hex') },
+            { deviceAssetId: '2', checksum: file2.toString('base64') },
+          ],
+        }),
+      ).resolves.toEqual({
+        existingIds: ['1', '2'],
+      });
+
+      expect(assetMock.getExistingByDeviceId).toHaveBeenCalledWith(authStub.admin.user.id, [file1, file2], undefined);
+    });
+    it('should query a specific device ID when one is provided', async () => {
+      const file1 = Buffer.from('d2947b871a706081be194569951b7db246907957', 'hex');
+      const file2 = Buffer.from('53be335e99f18a66ff12e9a901c7a6171dd76573', 'hex');
+      const deviceId = 'WEB';
+
+      assetMock.getExistingByDeviceId.mockResolvedValue([
+        { id: 'asset-1', checksum: file1 } as AssetEntity,
+        { id: 'asset-2', checksum: file2 } as AssetEntity,
+      ]);
+
+      await expect(
+        sut.checkExistingAssetChecksums(authStub.admin, {
+          deviceAssets: [
+            { deviceAssetId: '1', checksum: file1.toString('hex') },
+            { deviceAssetId: '2', checksum: file2.toString('base64') },
+          ],
+          deviceId: deviceId,
+        }),
+      ).resolves.toEqual({
+        existingIds: ['1', '2'],
+      });
+
+      expect(assetMock.getExistingByDeviceId).toHaveBeenCalledWith(authStub.admin.user.id, [file1, file2], deviceId);
+    });
+  });
 });
