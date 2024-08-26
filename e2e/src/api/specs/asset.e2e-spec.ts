@@ -1198,4 +1198,65 @@ describe('/asset', () => {
       expect(response.existingIds).toEqual(['test-asset-0']);
     });
   });
+  describe('POST /assets/exist/checksum', () => {
+    const test_images = [
+      {
+        deviceId: 'test-asset-device-0',
+        deviceAssetId: 'test-asset-0',
+        checksum: '',
+      },
+      {
+        deviceId: 'test-asset-device-0',
+        deviceAssetId: 'test-asset-1',
+        checksum: '',
+      },
+      {
+        deviceId: 'test-asset-device-1',
+        deviceAssetId: 'test-asset-2',
+        checksum: '',
+      },
+    ];
+    beforeAll(async () => {
+      for (const image of test_images) {
+        const response = await utils.createAsset(admin.accessToken, {
+          deviceId: image.deviceId,
+          deviceAssetId: image.deviceAssetId,
+        });
+
+        await utils.waitForWebsocketEvent({ event: 'assetUpload', id: response.id });
+        expect(response.status).toBe(AssetMediaStatus.Created);
+        const asset = await utils.getAssetInfo(admin.accessToken, response.id);
+        console.log(asset.checksum);
+        image.checksum = asset.checksum;
+      }
+    });
+
+    it('returns the IDs for matching checksums and device id', async () => {
+      const response = await utils.checkExistingAssetsbyChecksum(admin.accessToken, {
+        deviceId: 'test-asset-device-0',
+        deviceAssets: test_images,
+      });
+      expect(response.existingIds.sort()).toEqual(['test-asset-0', 'test-asset-1'].sort());
+    });
+
+    it('returns the IDs for all matching checksums when no device specified', async () => {
+      const response = await utils.checkExistingAssetsbyChecksum(admin.accessToken, {
+        deviceAssets: test_images,
+      });
+      expect(response.existingIds).toHaveLength(3);
+    });
+    it('ignores IDs for matching checksums but a non-matching device_id', async () => {
+      const response = await utils.checkExistingAssetsbyChecksum(admin.accessToken, {
+        deviceId: 'test-asset-device-does-not-exist',
+        deviceAssets: test_images,
+      });
+      expect(response.existingIds).toHaveLength(0);
+    });
+    it('only returns matching IDs associated with the library user', async () => {
+      const response = await utils.checkExistingAssetsbyChecksum(user2.accessToken, {
+        deviceAssets: test_images,
+      });
+      expect(response.existingIds).toHaveLength(0);
+    });
+  });
 });

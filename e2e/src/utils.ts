@@ -3,6 +3,7 @@ import {
   AssetMediaCreateDto,
   AssetMediaResponseDto,
   AssetResponseDto,
+  CheckExistingAssetChecksumsDto,
   CheckExistingAssetsDto,
   CreateAlbumDto,
   CreateLibraryDto,
@@ -13,6 +14,7 @@ import {
   UserAdminCreateDto,
   ValidateLibraryDto,
   checkExistingAssets,
+  checkExistingAssetsbyChecksum,
   createAlbum,
   createApiKey,
   createLibrary,
@@ -383,6 +385,11 @@ export const utils = {
 
   checkExistingAssets: (accessToken: string, checkExistingAssetsDto: CheckExistingAssetsDto) =>
     checkExistingAssets({ checkExistingAssetsDto }, { headers: asBearerAuth(accessToken) }),
+
+  checkExistingAssetsbyChecksum: (
+    accessToken: string,
+    checkExistingAssetChecksumsDto: CheckExistingAssetChecksumsDto,
+  ) => checkExistingAssetsbyChecksum({ checkExistingAssetChecksumsDto }, { headers: asBearerAuth(accessToken) }),
 
   metadataSearch: async (accessToken: string, dto: MetadataSearchDto) => {
     return searchMetadata({ metadataSearchDto: dto }, { headers: asBearerAuth(accessToken) });
