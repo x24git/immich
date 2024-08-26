@@ -44,5 +44,7 @@ export const newAssetRepositoryMock = (): Mocked<IAssetRepository> => {
     getChangedDeltaSync: vitest.fn(),
     getDuplicates: vitest.fn(),
     upsertFile: vitest.fn(),
+    getAssetsByOriginalPath: vitest.fn(),
+    getUniqueOriginalPaths: vitest.fn(),
   };
 };
