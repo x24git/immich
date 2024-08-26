@@ -5,6 +5,8 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { string } from 'joi';
+import { log } from 'node:console';
 import { extname } from 'node:path';
 import sanitize from 'sanitize-filename';
 import { StorageCore, StorageFolder } from 'src/cores/storage.core';
@@ -14,6 +16,7 @@ import {
   AssetMediaStatus,
   AssetRejectReason,
   AssetUploadAction,
+  CheckExistingAssetChecksumsResponseDto,
   CheckExistingAssetsResponseDto,
 } from 'src/dtos/asset-media-response.dto';
 import {
@@ -22,6 +25,7 @@ import {
   AssetMediaOptionsDto,
   AssetMediaReplaceDto,
   AssetMediaSize,
+  CheckExistingAssetChecksumsDto,
   CheckExistingAssetsDto,
   UploadFieldName,
 } from 'src/dtos/asset-media.dto';
@@ -284,6 +288,28 @@ export class AssetMediaService {
       checkExistingAssetsDto.deviceAssetIds,
     );
     return { existingIds };
+  }
+
+  async checkExistingAssetChecksums(
+    auth: AuthDto,
+    CheckExistingAssetChecksumsDto: CheckExistingAssetChecksumsDto,
+  ): Promise<CheckExistingAssetChecksumsResponseDto> {
+    const deviceAssetIdMap: Record<string, string> = {};
+    const checksums: Buffer[] = [];
+    for (const asset of CheckExistingAssetChecksumsDto.deviceAssets) {
+      deviceAssetIdMap[fromChecksum(asset.checksum).toString('hex')] = asset.deviceAssetId;
+      checksums.push(fromChecksum(asset.checksum));
+    }
+    const results = await this.assetRepository.getExistingByDeviceId(
+      auth.user.id,
+      checksums,
+      CheckExistingAssetChecksumsDto.deviceId,
+    );
+    return {
+      existingIds: results.map((asset) => {
+        return deviceAssetIdMap[asset.checksum.toString('hex')];
+      }),
+    };
   }
 
   async bulkUploadCheck(auth: AuthDto, dto: AssetBulkUploadCheckDto): Promise<AssetBulkUploadCheckResponseDto> {

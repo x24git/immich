@@ -1553,6 +1553,49 @@
         ]
       }
     },
+    "/assets/exist/checksum": {
+      "post": {
+        "description": "Checks if multiple assets exist on the server by checksum and returns all existing - used by background backup",
+        "operationId": "checkExistingAssetsbyChecksum",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckExistingAssetChecksumsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckExistingAssetChecksumsResponseDto"
+                }
+              }
+            },
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "cookie": []
+          },
+          {
+            "api_key": []
+          }
+        ],
+        "tags": [
+          "Assets"
+        ]
+      }
+    },
     "/assets/jobs": {
       "post": {
         "operationId": "runAssetJobs",
@@ -7848,6 +7891,22 @@
         ],
         "type": "object"
       },
+      "AssetExistingAssetChecksumItem": {
+        "properties": {
+          "checksum": {
+            "description": "base64 or hex encoded sha1 hash",
+            "type": "string"
+          },
+          "deviceAssetId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "checksum",
+          "deviceAssetId"
+        ],
+        "type": "object"
+      },
       "AssetFaceResponseDto": {
         "properties": {
           "boundingBoxX1": {
@@ -8487,6 +8546,37 @@
         "required": [
           "newPassword",
           "password"
+        ],
+        "type": "object"
+      },
+      "CheckExistingAssetChecksumsDto": {
+        "properties": {
+          "deviceAssets": {
+            "items": {
+              "$ref": "#/components/schemas/AssetExistingAssetChecksumItem"
+            },
+            "type": "array"
+          },
+          "deviceId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "deviceAssets"
+        ],
+        "type": "object"
+      },
+      "CheckExistingAssetChecksumsResponseDto": {
+        "properties": {
+          "existingIds": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "existingIds"
         ],
         "type": "object"
       },

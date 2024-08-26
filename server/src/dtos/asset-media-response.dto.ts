@@ -35,3 +35,7 @@ export class AssetBulkUploadCheckResponseDto {
 export class CheckExistingAssetsResponseDto {
   existingIds!: string[];
 }
+
+export class CheckExistingAssetChecksumsResponseDto {
+  existingIds!: string[];
+}

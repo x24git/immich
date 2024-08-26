@@ -86,6 +86,28 @@ export class AssetBulkUploadCheckDto {
   assets!: AssetBulkUploadCheckItem[];
 }
 
+export class AssetExistingAssetChecksumItem {
+  @IsString()
+  @IsNotEmpty()
+  deviceAssetId!: string;
+
+  /** base64 or hex encoded sha1 hash */
+  @IsString()
+  @IsNotEmpty()
+  checksum!: string;
+}
+
+export class CheckExistingAssetChecksumsDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AssetExistingAssetChecksumItem)
+  deviceAssets!: AssetExistingAssetChecksumItem[];
+
+  @Optional()
+  @IsString()
+  deviceId?: string;
+}
+
 export class CheckExistingAssetsDto {
   @ArrayNotEmpty()
   @IsString({ each: true })

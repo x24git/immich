@@ -249,6 +249,26 @@ export class AssetRepository implements IAssetRepository {
     return items.map((asset) => asset.deviceAssetId);
   }
 
+  @GenerateSql({ params: [DummyValue.UUID, DummyValue.BUFFER] })
+  async getExistingByDeviceId(ownerId: string, checksums: Buffer[], deviceId?: string): Promise<AssetEntity[]> {
+    const where: FindOptionsWhere<AssetEntity> | FindOptionsWhere<AssetEntity>[] = {
+      ownerId,
+      checksum: In(checksums),
+    };
+    if (deviceId) {
+      where.deviceId = deviceId;
+    }
+    return this.repository.find({
+      select: {
+        id: true,
+        checksum: true,
+        deviceId: true,
+      },
+      where: where,
+      withDeleted: true,
+    });
+  }
+
   @GenerateSql({ params: [DummyValue.UUID] })
   getLivePhotoCount(motionId: string): Promise<number> {
     return this.repository.count({

@@ -22,6 +22,7 @@ import {
   AssetBulkUploadCheckResponseDto,
   AssetMediaResponseDto,
   AssetMediaStatus,
+  CheckExistingAssetChecksumsResponseDto,
   CheckExistingAssetsResponseDto,
 } from 'src/dtos/asset-media-response.dto';
 import {
@@ -29,6 +30,7 @@ import {
   AssetMediaCreateDto,
   AssetMediaOptionsDto,
   AssetMediaReplaceDto,
+  CheckExistingAssetChecksumsDto,
   CheckExistingAssetsDto,
   UploadFieldName,
 } from 'src/dtos/asset-media.dto';
@@ -147,6 +149,19 @@ export class AssetMediaController {
     @Body() dto: CheckExistingAssetsDto,
   ): Promise<CheckExistingAssetsResponseDto> {
     return this.service.checkExistingAssets(auth, dto);
+  }
+
+  /**
+   * Checks if multiple assets exist on the server by checksum and returns all existing - used by background backup
+   */
+  @Post('exist/checksum')
+  @HttpCode(HttpStatus.OK)
+  @Authenticated()
+  checkExistingAssetsbyChecksum(
+    @Auth() auth: AuthDto,
+    @Body() dto: CheckExistingAssetChecksumsDto,
+  ): Promise<CheckExistingAssetChecksumsResponseDto> {
+    return this.service.checkExistingAssetChecksums(auth, dto);
   }
 
   /**
