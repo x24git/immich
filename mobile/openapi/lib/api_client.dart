@@ -231,6 +231,8 @@ class ApiClient {
           return AssetDeltaSyncDto.fromJson(value);
         case 'AssetDeltaSyncResponseDto':
           return AssetDeltaSyncResponseDto.fromJson(value);
+        case 'AssetExistingAssetChecksumItem':
+          return AssetExistingAssetChecksumItem.fromJson(value);
         case 'AssetFaceResponseDto':
           return AssetFaceResponseDto.fromJson(value);
         case 'AssetFaceUpdateDto':
@@ -283,6 +285,10 @@ class ApiClient {
           return CQModeTypeTransformer().decode(value);
         case 'ChangePasswordDto':
           return ChangePasswordDto.fromJson(value);
+        case 'CheckExistingAssetChecksumsDto':
+          return CheckExistingAssetChecksumsDto.fromJson(value);
+        case 'CheckExistingAssetChecksumsResponseDto':
+          return CheckExistingAssetChecksumsResponseDto.fromJson(value);
         case 'CheckExistingAssetsDto':
           return CheckExistingAssetsDto.fromJson(value);
         case 'CheckExistingAssetsResponseDto':

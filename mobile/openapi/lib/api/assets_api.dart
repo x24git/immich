@@ -120,6 +120,58 @@ class AssetsApi {
     return null;
   }
 
+  /// Checks if multiple assets exist on the server by checksum and returns all existing - used by background backup
+  ///
+  /// Note: This method returns the HTTP [Response].
+  ///
+  /// Parameters:
+  ///
+  /// * [CheckExistingAssetChecksumsDto] checkExistingAssetChecksumsDto (required):
+  Future<Response> checkExistingAssetsbyChecksumWithHttpInfo(CheckExistingAssetChecksumsDto checkExistingAssetChecksumsDto,) async {
+    // ignore: prefer_const_declarations
+    final path = r'/assets/exist/checksum';
+
+    // ignore: prefer_final_locals
+    Object? postBody = checkExistingAssetChecksumsDto;
+
+    final queryParams = <QueryParam>[];
+    final headerParams = <String, String>{};
+    final formParams = <String, String>{};
+
+    const contentTypes = <String>['application/json'];
+
+
+    return apiClient.invokeAPI(
+      path,
+      'POST',
+      queryParams,
+      postBody,
+      headerParams,
+      formParams,
+      contentTypes.isEmpty ? null : contentTypes.first,
+    );
+  }
+
+  /// Checks if multiple assets exist on the server by checksum and returns all existing - used by background backup
+  ///
+  /// Parameters:
+  ///
+  /// * [CheckExistingAssetChecksumsDto] checkExistingAssetChecksumsDto (required):
+  Future<CheckExistingAssetChecksumsResponseDto?> checkExistingAssetsbyChecksum(CheckExistingAssetChecksumsDto checkExistingAssetChecksumsDto,) async {
+    final response = await checkExistingAssetsbyChecksumWithHttpInfo(checkExistingAssetChecksumsDto,);
+    if (response.statusCode >= HttpStatus.badRequest) {
+      throw ApiException(response.statusCode, await _decodeBodyBytes(response));
+    }
+    // When a remote server returns no body with a status of 204, we shall not decode it.
+    // At the time of writing this, `dart:convert` will throw an "Unexpected end of input"
+    // FormatException when trying to decode an empty string.
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'CheckExistingAssetChecksumsResponseDto',) as CheckExistingAssetChecksumsResponseDto;
+    
+    }
+    return null;
+  }
+
   /// Performs an HTTP 'DELETE /assets' operation and returns the [Response].
   /// Parameters:
   ///

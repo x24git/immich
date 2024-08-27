@@ -371,6 +371,18 @@ export type CheckExistingAssetsDto = {
 export type CheckExistingAssetsResponseDto = {
     existingIds: string[];
 };
+export type AssetExistingAssetChecksumItem = {
+    /** base64 or hex encoded sha1 hash */
+    checksum: string;
+    deviceAssetId: string;
+};
+export type CheckExistingAssetChecksumsDto = {
+    deviceAssets: AssetExistingAssetChecksumItem[];
+    deviceId?: string;
+};
+export type CheckExistingAssetChecksumsResponseDto = {
+    existingIds: string[];
+};
 export type AssetJobsDto = {
     assetIds: string[];
     name: AssetJobName;
@@ -1603,6 +1615,21 @@ export function checkExistingAssets({ checkExistingAssetsDto }: {
         ...opts,
         method: "POST",
         body: checkExistingAssetsDto
+    })));
+}
+/**
+ * Checks if multiple assets exist on the server by checksum and returns all existing - used by background backup
+ */
+export function checkExistingAssetsbyChecksum({ checkExistingAssetChecksumsDto }: {
+    checkExistingAssetChecksumsDto: CheckExistingAssetChecksumsDto;
+}, opts?: Oazapfts.RequestOpts) {
+    return oazapfts.ok(oazapfts.fetchJson<{
+        status: 200;
+        data: CheckExistingAssetChecksumsResponseDto;
+    }>("/assets/exist/checksum", oazapfts.json({
+        ...opts,
+        method: "POST",
+        body: checkExistingAssetChecksumsDto
     })));
 }
 export function runAssetJobs({ assetJobsDto }: {
